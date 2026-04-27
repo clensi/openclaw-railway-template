@@ -9,14 +9,13 @@ RUN apt-get update \
     gosu \
     procps \
     python3 \
-    python3-pip \
     python3-venv \
     python3-requests \
     build-essential \
     zip \
   && rm -rf /var/lib/apt/lists/*
 
-# Install OpenClaw + Clawhub globally
+# Install OpenClaw + Clawhub globally (npm version)
 RUN npm install -g openclaw@2026.4.23 clawhub@latest
 
 WORKDIR /app
