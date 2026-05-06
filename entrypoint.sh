@@ -5,8 +5,8 @@ set -e
 chown -R openclaw:openclaw /data
 chmod 700 /data
 
-# No Homebrew manipulation — REMOVE ALL OF THIS
-# rm -rf /home/linuxbrew/.linuxbrew
-# ln -sfn /data/.linuxbrew /home/linuxbrew/.linuxbrew
+# Start Tailscale (non-blocking)
+/tailscale.d/start-tailscale.sh &
 
+# Start your Node server as openclaw
 exec gosu openclaw node src/server.js
