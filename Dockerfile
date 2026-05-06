@@ -28,11 +28,13 @@ ENV TAILSCALE_HOSTNAME="railway-openclaw"
 ENV TAILSCALE_ADDITIONAL_ARGS=""
 
 RUN curl -fsSL https://pkgs.tailscale.com/stable/tailscale_${TAILSCALE_VERSION}_amd64.tgz \
-    -o tailscale.tgz \
+      -o tailscale.tgz \
   && tar xzf tailscale.tgz --strip-components=1 \
   && rm tailscale.tgz \
   && mkdir -p /var/run/tailscale /var/cache/tailscale /var/lib/tailscale \
-  && chmod +x /tailscale.d/start-tailscale.sh
+  && chmod +x /tailscale.d/start-tailscale.sh \
+  && ln -s /tailscale.d/tailscale /usr/local/bin/tailscale \
+  && ln -s /tailscale.d/tailscaled /usr/local/bin/tailscaled
 
 # -------------------------
 # Install OpenClaw + Clawhub globally
