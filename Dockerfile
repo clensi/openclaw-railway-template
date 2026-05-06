@@ -13,9 +13,30 @@ RUN apt-get update \
     python3-requests \
     build-essential \
     zip \
+    iptables \
+    iproute2 \
   && rm -rf /var/lib/apt/lists/*
 
-# Install OpenClaw + Clawhub globally (npm version)
+# -------------------------
+# Install Tailscale
+# -------------------------
+WORKDIR /tailscale.d
+COPY start-tailscale.sh /tailscale.d/start-tailscale.sh
+
+ENV TAILSCALE_VERSION="latest"
+ENV TAILSCALE_HOSTNAME="railway-openclaw"
+ENV TAILSCALE_ADDITIONAL_ARGS=""
+
+RUN curl -fsSL https://pkgs.tailscale.com/stable/tailscale_${TAILSCALE_VERSION}_amd64.tgz \
+    -o tailscale.tgz \
+  && tar xzf tailscale.tgz --strip-components=1 \
+  && rm tailscale.tgz \
+  && mkdir -p /var/run/tailscale /var/cache/tailscale /var/lib/tailscale \
+  && chmod +x /tailscale.d/start-tailscale.sh
+
+# -------------------------
+# Install OpenClaw + Clawhub globally
+# -------------------------
 RUN npm install -g openclaw@2026.4.23 clawhub@latest
 
 WORKDIR /app
