@@ -1,6 +1,6 @@
 FROM node:22-bookworm
 
-# Install system dependencies + Python + requests (Debian-safe)
+# Install system dependencies
 RUN apt-get update \
   && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -16,6 +16,14 @@ RUN apt-get update \
     iptables \
     iproute2 \
   && rm -rf /var/lib/apt/lists/*
+
+# -------------------------
+# Install Caddy (TLS termination)
+# -------------------------
+RUN curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | tee /etc/apt/trusted.gpg.d/caddy.asc \
+  && curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy.list \
+  && apt-get update \
+  && apt-get install -y caddy
 
 # -------------------------
 # Install Tailscale
@@ -37,7 +45,7 @@ RUN curl -fsSL https://pkgs.tailscale.com/stable/tailscale_${TAILSCALE_VERSION}_
   && ln -s /tailscale.d/tailscaled /usr/local/bin/tailscaled
 
 # -------------------------
-# Install OpenClaw + Clawhub globally
+# Install OpenClaw + Clawhub
 # -------------------------
 RUN npm install -g openclaw@2026.4.23 clawhub@latest
 
@@ -50,8 +58,9 @@ RUN corepack enable && pnpm install --frozen-lockfile --prod
 # Copy application code
 COPY src ./src
 COPY --chmod=755 entrypoint.sh ./entrypoint.sh
+COPY Caddyfile /etc/caddy/Caddyfile
 
-# Create non-root user for OpenClaw
+# Create non-root user
 RUN useradd -m -s /bin/bash openclaw \
   && chown -R openclaw:openclaw /app \
   && mkdir -p /data && chown openclaw:openclaw /data
