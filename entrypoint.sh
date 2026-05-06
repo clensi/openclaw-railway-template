@@ -1,12 +1,11 @@
 #!/bin/bash
 set -e
 
-# Ensure /data permissions
-chown -R openclaw:openclaw /data
-chmod 700 /data
+# Start Tailscale (optional)
+ /tailscale.d/start-tailscale.sh &
 
-# Start Tailscale (non-blocking)
-/tailscale.d/start-tailscale.sh &
+# Start OpenClaw on port 8081
+gosu openclaw node src/server.js --port 8081 &
 
-# Start your Node server as openclaw
-exec gosu openclaw node src/server.js
+# Start Caddy (TLS termination on 8080)
+exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
