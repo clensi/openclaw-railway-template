@@ -1,5 +1,11 @@
 #!/bin/sh
+set -e
 
+# Ensure persistent Tailscale state directory exists
+mkdir -p /data/tailscale
+chown -R openclaw:openclaw /data/tailscale
+
+# Start tailscaled in userspace mode with persistent state
 /tailscale.d/tailscaled \
   --state=/data/tailscale/tailscaled.state \
   --socket=/var/run/tailscale/tailscaled.sock \
