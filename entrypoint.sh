@@ -1,11 +1,4 @@
 #!/bin/bash
 set -e
-
-# Start Tailscale (optional)
- /tailscale.d/start-tailscale.sh &
-
-# Start OpenClaw on port 8081
-gosu openclaw node src/server.js --port 8081 &
-
-# Start Caddy (TLS termination on 8080)
-exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
+chown -R 1001:1001 /data/.openclaw/ 2>/dev/null || true
+exec gosu openclaw node src/server.js
